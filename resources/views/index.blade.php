@@ -15,15 +15,16 @@
 
     <h3>Filter</h3>
     <form id="filterForm">
+        @csrf
         @foreach($categories as $category)
             <label>
                 <input type="checkbox" name="categories[]" value="{{$category->id}}">{{$category->name}}
             </label>
         @endforeach
         <br>
-        <button class="btn btn-primary" id="applyFilter">Применить</button>
+        <button type="button" class="btn btn-primary" id="applyFilter">Применить</button>
     </form>
-    <div id="filteredResults">
+    <div id="results">
         <!-- Filtered results will be displayed here -->
     </div>
 @endsection
@@ -31,38 +32,40 @@
     <script>
         $(document).ready(function() {
             $('#applyFilter').click(function() {
-                var selectedCategories = $('input[name="categories[]"]:checked').map(function() {
-                    return $(this).val();
-                })
-                // Send an AJAX GET request to the Laravel API
-                $.ajax({
-                    url: '/api/filter/' + selectedCategories,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(response) {
-                        // Handle the success response
-                        var filteredData = response.filteredData;
+                var formData = $('#filterForm').serialize(); // Serialize the form data
 
-                        // Update the filtered results div with the new data
-                        $('#filteredResults').html(renderFilteredData(filteredData));
+                console.log(formData)
+                // Send an AJAX POST request to a Laravel route or controller method
+                $.ajax({
+                    url: '/filter', // Replace with your Laravel route or controller method
+                    type: 'POST', // Use POST or GET based on your route or method
+                    data: formData,
+                    success: function(response) {
+                        var data = response.data;
+
+                        // Iterate through the data and create HTML elements
+                        var html = '<ul>';
+                        data.forEach(function(item) {
+                            html += '<li>ID: ' + item.id + ', Name: ' + item.name + '</li>';
+                        });
+                        html += '</ul>';
+                        var selectedCategories = $('input[name="categories[]"]:checked').map(function() {
+                            return $(this).textContent;
+                        }).get();
+                        var newUrl = '/' + selectedCategories.join('-'); // Customize the URL format as needed
+                        history.pushState(null, null, newUrl);
+                        // Display the HTML on your web page
+                        $('#results').html(html);
                     },
                     error: function(error) {
+                        // Handle any errors that occur during the request
                         console.error(error);
                     }
                 });
-
-                // Update the URL without page reload
-                history.pushState(null, null, '/platnie/' + selectedCategories);
 
                 // Prevent the default form submission
                 return false;
             });
         });
-
-        function renderFilteredData(data) {
-            // Implement logic to render the filtered data as HTML
-            // You can use templates or generate HTML dynamically
-            // Return the HTML content
-        }
     </script>
 @endpush

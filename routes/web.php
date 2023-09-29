@@ -14,3 +14,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/',[App\Http\Controllers\ObjectController::class,'index'])->name('products');
+Route::post('/filter', [App\Http\Controllers\FilterController::class,'filter']);

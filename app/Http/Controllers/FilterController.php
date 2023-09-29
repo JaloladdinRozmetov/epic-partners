@@ -2,17 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class FilterController extends Controller
 {
-    public function filter($categories)
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function filter(Request $request):JsonResponse
     {
+        $selectedCategories = $request->input('categories');
 
-//        $filteredData = Category::whereIn('category', explode('-', $categories))->get();
-
-        // Return the filtered data as JSON
-        return response()->json(['filteredData' => 1]);
+        $objectsInCategory = Product::whereHas('categories', function ($query) use ($selectedCategories) {
+            $query->whereIn('categories.id', $selectedCategories);
+        })->get();
+        return response()->json([
+            'data' => $objectsInCategory,
+            'message' => 'Form data received successfully'
+        ]);
     }
 }
