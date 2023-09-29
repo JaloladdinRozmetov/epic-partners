@@ -25,25 +25,25 @@
         <button type="button" class="btn btn-primary" id="applyFilter">Применить</button>
     </form>
     <div id="results">
-        <!-- Filtered results will be displayed here -->
+
     </div>
 @endsection
 @push('script')
     <script>
         $(document).ready(function() {
             $('#applyFilter').click(function() {
-                var formData = $('#filterForm').serialize(); // Serialize the form data
+                var formData = $('#filterForm').serialize();
 
                 console.log(formData)
-                // Send an AJAX POST request to a Laravel route or controller method
+
                 $.ajax({
-                    url: '/filter', // Replace with your Laravel route or controller method
-                    type: 'POST', // Use POST or GET based on your route or method
+                    url: '/filter',
+                    type: 'POST',
                     data: formData,
                     success: function(response) {
                         var data = response.data;
 
-                        // Iterate through the data and create HTML elements
+
                         var html = '<ul>';
                         data.forEach(function(item) {
                             html += '<li>ID: ' + item.id + ', Name: ' + item.name + '</li>';
@@ -52,18 +52,18 @@
                         var selectedCategories = $('input[name="categories[]"]:checked').map(function() {
                             return $(this).textContent;
                         }).get();
-                        var newUrl = '/' + selectedCategories.join('-'); // Customize the URL format as needed
+                        var newUrl = '/' + selectedCategories.join('-');
                         history.pushState(null, null, newUrl);
-                        // Display the HTML on your web page
+
                         $('#results').html(html);
                     },
                     error: function(error) {
-                        // Handle any errors that occur during the request
+
                         console.error(error);
                     }
                 });
 
-                // Prevent the default form submission
+
                 return false;
             });
         });
